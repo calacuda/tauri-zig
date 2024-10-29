@@ -322,6 +322,11 @@ fn build_command(
     args.push(target);
   }
 
+  log::info!(
+    "running build command: \"{runner} build {}\"",
+    args.join(" ")
+  );
+
   let mut build_cmd = Command::new(runner);
   build_cmd.arg("build");
   build_cmd.args(args);
@@ -351,8 +356,10 @@ fn fetch_available_targets() -> Option<Vec<RustupTarget>> {
 
 fn validate_target(
   available_targets: &Option<Vec<RustupTarget>>,
-  target: &str,
+  full_target: &str,
 ) -> crate::Result<()> {
+  let target = strip_libc_version_num(full_target);
+
   if let Some(available_targets) = available_targets {
     if let Some(target) = available_targets.iter().find(|t| t.name == target) {
       if !target.installed {
@@ -368,6 +375,35 @@ fn validate_target(
     }
   }
   Ok(())
+}
+
+fn strip_libc_version_num(full_target: &str) -> String {
+  if full_target.starts_with("thumbv8m") {
+    // split on second occurance of the period char
+    // this is real messy, but it works!
+    let mut target = String::new();
+
+    for part in full_target.split(".") {
+      if part.trim().parse::<f64>().is_ok() {
+        break;
+      }
+
+      target.push_str(part); // = format!("{target}.{part}")
+    }
+
+    target.into()
+  } else {
+    // if full_target.contains(".") {
+    //   full_target.split(".").next().unwrap().into()
+    // } else {
+    //   full_target.into()
+    // }
+    if let Some(target) = full_target.split(".").next() {
+      target.into()
+    } else {
+      full_target.into()
+    }
+  }
 }
 
 fn rename_app(bin_path: PathBuf, main_binary_name: Option<&str>) -> crate::Result<PathBuf> {

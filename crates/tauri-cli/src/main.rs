@@ -23,13 +23,13 @@ fn main() {
     .and_then(Path::file_stem)
     .and_then(OsStr::to_str)
   {
-    Some("cargo-tauri") => {
-      if args.peek().and_then(|s| s.to_str()) == Some("tauri") {
+    Some("cargo-tauri-zb") => {
+      if args.peek().and_then(|s| s.to_str()) == Some("tauri-zb") {
         // remove the extra cargo subcommand
         args.next();
-        Some("cargo tauri".into())
+        Some("cargo tauri-zb".into())
       } else {
-        Some("cargo-tauri".into())
+        Some("cargo-tauri-zb".into())
       }
     }
     Some(stem) => Some(stem.to_string()),
@@ -39,5 +39,5 @@ fn main() {
     }
   };
 
-  tauri_cli::run(args, bin_name)
+  tauri_zig_cli::run(args, bin_name)
 }

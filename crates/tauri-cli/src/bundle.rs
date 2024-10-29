@@ -92,6 +92,19 @@ impl From<crate::build::Options> for Options {
   }
 }
 
+impl From<crate::zig_build::Options> for Options {
+  fn from(value: crate::zig_build::Options) -> Self {
+    Self {
+      bundles: value.bundles,
+      target: value.target,
+      features: value.features,
+      debug: value.debug,
+      ci: value.ci,
+      config: value.config,
+    }
+  }
+}
+
 pub fn command(options: Options, verbosity: u8) -> crate::Result<()> {
   crate::helpers::app_paths::resolve();
 

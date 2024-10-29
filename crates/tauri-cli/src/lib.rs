@@ -31,6 +31,7 @@ mod migrate;
 mod mobile;
 mod plugin;
 mod signer;
+mod zig_build;
 
 use clap::{ArgAction, CommandFactory, FromArgMatches, Parser, Subcommand, ValueEnum};
 use env_logger::fmt::style::{AnsiColor, Style};
@@ -138,6 +139,8 @@ enum Commands {
   Init(init::Options),
   Dev(dev::Options),
   Build(build::Options),
+  #[clap(name = "zigbuild")]
+  ZigBuild(zig_build::Options),
   Bundle(bundle::Options),
   Android(mobile::android::Cli),
   #[cfg(target_os = "macos")]
@@ -278,6 +281,7 @@ where
     Commands::Ios(c) => mobile::ios::command(c, cli.verbose)?,
     Commands::Migrate => migrate::command()?,
     Commands::Inspect(cli) => inspect::command(cli)?,
+    Commands::ZigBuild(options) => zig_build::command(options, cli.verbose)?,
   }
 
   Ok(())
